@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="https://getbootstrap.com/examples/signin/signin.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div id="signinButton" class="well text-center" style="background-image: url('https://images.unsplash.com/photo-1518066000714-58c45f1a2c0a?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=3c11bb4d0a0cb5cf4133b2aa4f929f14&auto=format&fit=crop&w=750&q=80'); color: white; height: 95vh; margin-top: 1em">
+                <h2 style="margin-top: 4em;">Space Catalog App</h2>
+                <p class="lead">Please login to create awesome categories and items of your own!</p>
+                <hr>
+                <div class="row">
+                    <div class="col-md-12 col-xs-12"><p>Login with Google</p></div>
+                    <!-- <div class="col-md-6 col-xs-6"><p>Login with Facebook</p></div> -->
+                </div>
+                <div class="row">
+                    <div class="col-md-12 col-xs-12">
+                        <span class="g-signin"
+                              data-scope="openid email"
+                              data-clientid="822267457383-47cj3f7f30tsbcoaf77gq6khstn7k6ru.apps.googleusercontent.com"
+                              data-redirecturi="postmessage"
+                              data-accesstype="offline"
+                              data-cookiepolicy="single_host_origin"
+                              data-callback="signInCallBack"
+                              data-approvalprompt="force">
+                        </span>
+                    </div>
+                    <!-- <div class="col-md-6 col-xs-6">
+                        <fb:login-button size="large"
+                          scope="public_profile,email"
+                          onlogin="sendTokenToServer();">
+                        </fb:login-button>
+                    </div> -->
+                 </div>
+            </div>
+
+        </div>
+            <div id="result" class="col-md-4 col-md-offset-4 text-center"></div>
+    </div>
+
+    <!--Implement Google Log-in-->
+    <script>
+        function signInCallBack (authResult) {
+            if (authResult['code']) {
+                //Hide the sign-in button now that the user is authorized
+                $('#signinButton').attr('style', 'display: none');
+                //Send the one-time code to the server, if the server responds, write a 'login successful message to the web page and the redirect back to the home page
+                $.ajax({
+                    type: 'POST',
+                    url: '/gconnect?state={{STATE}}',
+                    processData: false,
+                    contentType: 'application/octet-stream; charset=utf-8',
+                    data: authResult['code'],
+                    success: function (result) {
+                        if (result) {
+                            $('#result').html('Login Successful!</br>'+ result +'</br>Redirecting...')
+                            setTimeout(function() {
+                                window.location.href = "/catalog";
+                            }, 2000);
+                        } else if (authResult['error']) {
+                            console.log('There was an error: ' + authResult['error']);
+                        } else {
+                            $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+
+    <!--Implement Facebook Log-in-->
+    
+
+</body>
+</html>
